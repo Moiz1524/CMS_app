@@ -1,0 +1,47 @@
+<% layout('layout2') %>
+
+<div id="wrapper">
+
+<% include ../partials/sidebar %>
+
+    <div id="page-content-wrapper">
+
+      <% include ../partials/navbar %>
+
+      <div class="container-fluid main_body">
+  <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
+  <h1>Happy Searching!</h1>
+  <p>Here the results are</p>
+</div>
+<br>
+<br>
+<br>
+<div class="container">
+  <div class="row">
+      <div class="col-xs-12 col-md-6 col-lg-4 companyListDiv">
+          <div class="row">
+            <div class="col-xs-4">
+                <img src="/uploads/<%= data.image %>" class="img-responsive" style="margin-top:10px">
+            </div>
+              <div class="col-xs-8">
+                  <div class="companyListItemInfo">
+                      <h5 class=""><%= data.name %></h5>
+                      <span class="">
+                        <i class="star"></i>
+                        <%= data.phone_no %>
+                      </span>
+                      <br>
+                      <i class="fa fa-building-o "></i>
+                      <%= data.sector %>
+                      <br>
+                      <i class="fa fa-map-marker "></i>
+                      <%= data.city %>,
+                      <%= data.country %>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+ </div>
+</div>
+</div>

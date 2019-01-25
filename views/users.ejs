@@ -1,0 +1,46 @@
+<% layout('layout2') %>
+
+<div id="wrapper">
+
+    <% include ./partials/sidebar_2 %>
+
+    <div id="page-content-wrapper">
+        <% include ./partials/navbar_2 %>
+        <div class="container-fluid main_body">
+			<div class="ul_links">
+	            <ul>
+	                <li><a href="/home">Home</a></li> |
+	                <li><a href="/contacts_all">All Contacts</a></li>
+	            </ul>
+	        </div>
+
+            <div class="bodyDiv">
+				<h4 style="">Users</h4>
+
+      <% for (var i = 0; i < data.length; i++ ) { %>
+        <div class="row">
+          <div class="col-md-4" style="margin-bottom:10px;">
+            <div class="companyListDiv user-panel">
+              <div class="row">
+                <div class="col-xs-4">
+                  <img src="/uploads/<%= data[i].image %>" class="img-responsive">
+                </div>
+                <div class="col-xs-4">
+                  <div class="companyListItemInfo">
+                      <h5 class=""><%= data[i].username %></h5>
+                      <span class="">
+                        <i class="star"></i>
+                        <%= data[i].email %>
+                      </span>
+                      <br>
+                  </div>
+                </div>
+              </div>
+
+              </div>
+          </div>
+        </div>
+      <% } %>
+      </div>
+    </div>
+</div>
