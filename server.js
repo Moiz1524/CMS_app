@@ -9,6 +9,7 @@ var MongoStore = require('connect-mongo')(session);
 var passport = require('passport');
 var flash = require('connect-flash');
 var validator = require('express-validator');
+const port = process.env.PORT || 3000;
 
 
 
@@ -45,6 +46,6 @@ app.use(passport.session());
 require('./routes/user')(app);
 require('./routes/newContact')(app);
 
-app.listen('3000', () => {
-  console.log('Server is up on port 3000');
+app.listen(port, () => {
+  console.log(`Server is up on port ${port}`);
 });
