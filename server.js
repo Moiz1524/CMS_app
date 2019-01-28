@@ -5,7 +5,8 @@ var ejs = require('ejs');
 var engine = require('ejs-mate');
 var session = require('express-session');
 var mongoose = require('mongoose');
-var MongoStore = require('connect-mongo')(session);
+var MongoDBStore = require('connect-mongodb-session')(session);
+// var MongoStore = require('connect-mongodb')(session);
 var passport = require('passport');
 var flash = require('connect-flash');
 var validator = require('express-validator');
@@ -19,6 +20,28 @@ const port = process.env.PORT || 3000;
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost:27017/CMS_db', {useNewUrlParser: true})
 
+var store = new MongoDBStore({
+  uri: 'mongodb://localhost:27017/CMS_db',
+  collection: 'sessions'
+});
+
+// Catch errors
+store.on('error', function(error) {
+  console.log(error);
+});
+
+app.use(require('express-session')({
+  secret: 'This is a secret',
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
+  },
+  store: store,
+  // Boilerplate options, see:
+  // * https://www.npmjs.com/package/express-session#resave
+  // * https://www.npmjs.com/package/express-session#saveuninitialized
+  resave: false,
+  saveUninitialized: false
+}));
 
 require('./config/passport');
 
@@ -32,12 +55,12 @@ app.use(bodyParser.json());
 app.use(validator());
 
 
-app.use(session({
-  secret: 'Thisismytestkey',
-  resave: false,
-  saveUninitialized: false,
-  store: new MongoStore({mongooseConnection: mongoose.connection})
-}));
+// app.use(session({
+//   secret: 'Thisismytestkey',
+//   resave: false,
+//   saveUninitialized: false,
+//   store: new MongoStore({mongooseConnection: mongoose.connection})
+// }));
 
 app.use(flash());
 app.use(passport.initialize());
