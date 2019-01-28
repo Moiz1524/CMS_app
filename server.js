@@ -18,7 +18,7 @@ const port = process.env.PORT || 3000;
 
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/CMS_db', {useNewUrlParser: true})
+mongoose.connect(process.env.MONGODB_URI ||  'mongodb://localhost:27017/CMS_db', {useNewUrlParser: true});
 
 // var store = new MongoDBStore({
 //   uri: 'mongodb://localhost:27017/CMS_db',
