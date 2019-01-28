@@ -11,11 +11,9 @@ var flash = require('connect-flash');
 var validator = require('express-validator');
 
 
-const port = process.env.PORT || 3000;
-
-
-
 var app = express();
+
+const port = process.env.PORT || 3000;
 
 
 mongoose.Promise = global.Promise;
