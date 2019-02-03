@@ -4,6 +4,7 @@ var path = require('path');
 var fs = require('fs');
 var User = require('./../models/userModel');
 var nodemailer = require('nodemailer');
+var {authenticate} = require('./../middlewares/authenticate');
 // const {body} = require('express-validator/check');
 
 module.exports = (app) => {
@@ -11,24 +12,78 @@ module.exports = (app) => {
       res.render('index.ejs', {title: 'Index'});
     });
 
-  app.get('/signup', (req, res) => {
+  app.get('/signup', authenticate, (req, res) => {
     var errors = req.flash('error');
     console.log(errors);
     res.render('user/signup.ejs', {title: 'Sign Up', messages: errors, hasErrors: errors.length > 0});
   });
 
   app.get('/login', (req, res) => {
+    var error_1 = req.flash('Denied!');
     var errors = req.flash('error');
     console.log(errors);
-    res.render('user/login.ejs', {title: 'Login', messages: errors, hasErrors: errors.length > 0});
+    console.log(error_1);
+    res.render('user/login.ejs', {title: 'Login', errorOutput: error_1, loginFirst: error_1.length > 0, messages: errors, hasErrors: errors.length > 0});
   });
 
-  app.post('/signup', validate, passport.authenticate('local.signup', {
-    successRedirect: '/home_1',
-    failureRedirect: '/signup',
-    successFlash: 'Valid',
-    failureFlash: 'Invalid'
-  }));
+  app.post('/signup', validate, (req, res) => {
+    var nameUser = req.body.username;
+    var userPassword = req.body.password;
+    var name = req.body.username;
+    User.findOne({username: name}, (err, result) => {
+      if (result) {
+        console.log('User already exists');
+        res.redirect('/signup');
+      }else {
+
+      var user = new User(req.body);
+        // console.log(req.body);
+
+      // user.username = req.body.username;
+      // user.email = req.body.email;
+      // user.password = req.body.password;
+      // user.confirmPassword = req.body.confirmPassword;
+      user.image = req.body.upload;
+      user.password = user.encryptPassword(req.body.password);
+      user.confirmPassword = user.encryptPassword(req.body.confirmPassword);
+      // user.generateAuthtoken();
+
+      user.save((err, user) => {
+        if (err) {
+          return console.log('Unable to save user.', err);
+        }
+          return user;
+      });
+      res.redirect('/home');
+    }});
+
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'amoiz4142@gmail.com',
+          pass: 'Yolo18M:)'
+        },
+        tls: {
+          rejectUnauthorized: false
+        }
+      });
+
+    var mailOptions = {
+      from: 'amoiz4142@gmail.com',
+      to: req.body.email,
+      subject: 'Login Credentials',
+      text: `Hey there! Welcome to CMS! You can evaluate the amazing features by just signing in.
+      Your Login Credentials are: Username: ${nameUser}, Password: ${userPassword}`
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+  });
+});
 
   app.post('/login', validateLogin, passport.authenticate('local.login', {
     successRedirect: '/home',
@@ -36,17 +91,17 @@ module.exports = (app) => {
     failureFlash: true
   }));
 
-  app.get('/home_1', (req, res) => {
-    var success = req.flash('Success!');
-    res.render('admin_home.ejs', {
-      title: 'CMS || Admin',
-      user: req.user,
-      success: success,
-      noErrors: success.length > 0
-    })
-  })
+  // app.get('/home_1', (req, res) => {
+  //   var success = req.flash('Success!');
+  //   res.render('admin_home.ejs', {
+  //     title: 'CMS || Admin',
+  //     user: req.user,
+  //     success: success,
+  //     noErrors: success.length > 0
+  //   })
+  // })
 
-  app.get('/home', (req, res) => {
+  app.get('/home', authenticate, (req, res) => {
     res.render('home.ejs', {title: 'Home || CMS', user: req.user});
   });
 
@@ -57,7 +112,7 @@ module.exports = (app) => {
     });
   });
 
-  app.get('/all_users', (req, res) => {
+  app.get('/all_users', authenticate, (req, res) => {
     User.find({}, (err, result) => {
       if (err) {
         return console.log('Unable to fetch all users.');
@@ -102,6 +157,7 @@ var validate = (req, res, next) => {
   req.check("password", "Password Must Contain at least 1 Number.").matches(/^(?=.*\d)(?=.*[a-z])[0-9a-z]{5,}$/, "i");
   req.checkBody('confirmPassword', 'Passwords Mismatched!').equals(req.body.password);
 
+
   var errors = req.validationErrors();
 
   if (errors) {
@@ -115,7 +171,7 @@ var validate = (req, res, next) => {
   }else {
     return next();
   }
-}
+};
 
 // var validateUser = (req, res) => {
 //   if (req.body.isAdmin === true) {

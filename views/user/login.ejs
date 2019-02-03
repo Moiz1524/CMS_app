@@ -9,9 +9,7 @@
    <br><br>
 
    <div class="col-md-offset-4">
-         <a href="/auth/facebook" class="btn btn-block btn-social btn-facebook btn-lg">
-            <i class="fa fa-facebook"></i> Sign up with Facebook
-        </a>
+
     </div><br>
 
 
@@ -20,6 +18,14 @@
    </div><br>
 
     <div class="row signup">
+    <%  if (loginFirst) { %>
+      <div class="alert alert-danger">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">
+        </a>
+        <%= errorOutput %>
+      </div>
+    <%  } %>
+
       <% if (hasErrors) { %>
         <% for ( var i=0; i < messages.length; i++ ){ %>
           <div class="alert alert-danger">
@@ -51,9 +57,6 @@
 
           </form>
 
-          <div>
-              <h4>Don't have an account? <a href="/signup">Sign up</a></h4>
-          </div>
 
 
     </div>

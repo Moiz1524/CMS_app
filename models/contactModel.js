@@ -32,6 +32,10 @@ var contactSchema = mongoose.Schema({
   image: {
     type: String
   }
+  // _creator: {
+  //   required: true,
+  //   type: mongoose.Schema.Types.ObjectId
+  // }
 });
 
 

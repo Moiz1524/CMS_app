@@ -21,6 +21,7 @@
       <div class="col-xs-12 col-md-6 col-lg-4 companyListDiv">
           <div class="row">
             <div class="col-xs-4">
+              <% if (data !== undefined) { %>
                 <img src="/uploads/<%= data.image %>" class="img-responsive" style="margin-top:10px">
             </div>
               <div class="col-xs-8">
@@ -39,7 +40,10 @@
                       <%= data.country %>
                   </div>
               </div>
-          </div>
+            </div>
+            <% } else { %>
+              <h5>Sorry! No items matched your query</h5>
+            <% } %>
       </div>
   </div>
  </div>

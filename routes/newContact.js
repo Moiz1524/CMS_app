@@ -3,9 +3,10 @@ var mongoose = require('mongoose');
 var formidable = require('formidable');
 var path = require('path');
 var fs = require('fs');
+var {authenticate} = require('./../middlewares/authenticate');
 
 module.exports = (app) => {
-   app.get('/contact/create', (req, res) => {
+   app.get('/contact/create', authenticate, (req, res) => {
      var success = req.flash('Success!');
      res.render('contacts/contact.ejs', {
        title: 'Contact Registration',
@@ -25,6 +26,7 @@ module.exports = (app) => {
      newContact.sector = req.body.sector;
      newContact.website = req.body.website;
      newContact.image = req.body.upload;
+     // newContact._creator = req.user.id;
 
      Contact.findOne({newContact}, (err) => {
        if (err) {
@@ -43,14 +45,14 @@ module.exports = (app) => {
    });
  });
 
-   app.get('/contact/search', (req, res) => {
+   app.get('/contact/search', authenticate, (req, res) => {
        res.render('contacts/search.ejs', {
          title: 'Search Contact',
          user: req.user
      });
    });
 
-   app.get('/contacts_all', (req, res) => {
+   app.get('/contacts_all', authenticate, (req, res) => {
      Contact.find({}, (err, result) => {
        console.log(JSON.stringify(result, undefined, 2));
        res.render('contacts/contacts_all.ejs', {
@@ -65,14 +67,19 @@ module.exports = (app) => {
      var name = req.body.name;
      Contact.findOne({name}, (err, data) => {
        if (err) {
-         console.log(err);
+        return console.log(err);
        }
-       console.log(JSON.stringify(data, undefined, 2));
-       res.redirect('/contact/search_result/' + data._id);
+       if (data === null) {
+         res.redirect('/contact/search_result/:id');
+       }else {
+         console.log(JSON.stringify(data, undefined, 2));
+         res.redirect('/contact/search_result/' + data._id);
+       }
+
      });
 
 });
-   app.get('/contact/search_result/:id', (req, res) => {
+   app.get('/contact/search_result/:id', authenticate, (req, res) => {
        Contact.findOne({'_id': req.params.id}, (err, data) => {
          res.render('contacts/search_result.ejs', {
            title: 'Search Result || CMS',
