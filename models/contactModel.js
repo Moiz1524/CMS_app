@@ -31,11 +31,11 @@ var contactSchema = mongoose.Schema({
   },
   image: {
     type: String
+  },
+  _creator: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
   }
-  // _creator: {
-  //   required: true,
-  //   type: mongoose.Schema.Types.ObjectId
-  // }
 });
 
 

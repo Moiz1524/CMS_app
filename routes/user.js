@@ -29,10 +29,11 @@ module.exports = (app) => {
   app.post('/signup', validate, (req, res) => {
     var nameUser = req.body.username;
     var userPassword = req.body.password;
-    var name = req.body.username;
-    User.findOne({username: name}, (err, result) => {
+    User.findOne({
+      email: req.body.email
+    }, (err, result) => {
       if (result) {
-        console.log('User already exists');
+        console.log('User already exists!.');
         res.redirect('/signup');
       }else {
 
@@ -54,35 +55,34 @@ module.exports = (app) => {
         }
           return user;
       });
+      var transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: 'amoiz4142@gmail.com',
+            pass: 'Yolo18M:)'
+          },
+          tls: {
+            rejectUnauthorized: false
+          }
+        });
+
+      var mailOptions = {
+        from: 'amoiz4142@gmail.com',
+        to: req.body.email,
+        subject: 'Login Credentials',
+        text: `Hey there! Welcome to CMS! You can evaluate the amazing features by just signing in.
+        Your Login Credentials are: Username: ${nameUser}, Password: ${userPassword}`
+      };
+
+      transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+    });
       res.redirect('/home');
     }});
-
-    var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: 'amoiz4142@gmail.com',
-          pass: 'Yolo18M:)'
-        },
-        tls: {
-          rejectUnauthorized: false
-        }
-      });
-
-    var mailOptions = {
-      from: 'amoiz4142@gmail.com',
-      to: req.body.email,
-      subject: 'Login Credentials',
-      text: `Hey there! Welcome to CMS! You can evaluate the amazing features by just signing in.
-      Your Login Credentials are: Username: ${nameUser}, Password: ${userPassword}`
-    };
-
-    transporter.sendMail(mailOptions, function(error, info){
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-  });
 });
 
   app.post('/login', validateLogin, passport.authenticate('local.login', {

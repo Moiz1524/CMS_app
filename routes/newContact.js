@@ -1,5 +1,6 @@
 var Contact = require('./../models/contactModel');
 var mongoose = require('mongoose');
+var {ObjectID} = require('mongodb');
 var formidable = require('formidable');
 var path = require('path');
 var fs = require('fs');
@@ -16,7 +17,7 @@ module.exports = (app) => {
      });
    });
 
-   app.post('/contact/create', validateContact, (req, res) => {
+   app.post('/contact/create', authenticate, validateContact, (req, res) => {
      var newContact = new Contact();
      newContact.name = req.body.name;
      newContact.phone_no = req.body.phone_no;
@@ -26,7 +27,7 @@ module.exports = (app) => {
      newContact.sector = req.body.sector;
      newContact.website = req.body.website;
      newContact.image = req.body.upload;
-     // newContact._creator = req.user.id;
+     newContact._creator = req.user.id;
 
      Contact.findOne({newContact}, (err) => {
        if (err) {
@@ -53,30 +54,57 @@ module.exports = (app) => {
    });
 
    app.get('/contacts_all', authenticate, (req, res) => {
-     Contact.find({}, (err, result) => {
-       console.log(JSON.stringify(result, undefined, 2));
-       res.render('contacts/contacts_all.ejs', {
-         title: 'All Contacts || CMS',
-         user: req.user,
-         data: result
+     if (req.user.username === 'Moiz Ali') {
+       Contact.find({}, (err, result) => {
+         console.log(JSON.stringify(result, undefined, 2));
+         res.render('contacts/contacts_all.ejs', {
+           title: 'All Contacts || CMS',
+           user: req.user,
+           data: result
+         });
        });
-     });
+     }else {
+       Contact.find({_creator: req.user._id}, (err, result) => {
+         console.log(JSON.stringify(result, undefined, 2));
+         res.render('contacts/contacts_all.ejs', {
+           title: 'All Contacts || CMS',
+           user: req.user,
+           data: result
+         });
+       });
+     }
    });
 
    app.post('/contact/search', (req, res) => {
      var name = req.body.name;
-     Contact.findOne({name}, (err, data) => {
-       if (err) {
-        return console.log(err);
-       }
-       if (data === null) {
-         res.redirect('/contact/search_result/:id');
-       }else {
-         console.log(JSON.stringify(data, undefined, 2));
-         res.redirect('/contact/search_result/' + data._id);
-       }
-
-     });
+     if (req.user.username === 'Moiz Ali') {
+       Contact.findOne({name}, (err, data) => {
+         if (err) {
+          return console.log(err);
+         }
+         if (data === null) {
+           res.redirect('/contact/search_result/:id');
+         }else {
+           console.log(JSON.stringify(data, undefined, 2));
+           res.redirect('/contact/search_result/' + data._id);
+         }
+       });
+     }else {
+       Contact.findOne({
+         name,
+         _creator: req.user._id
+       }, (err, data) => {
+         if (err) {
+          return console.log(err);
+         }
+         if (data === null) {
+           res.redirect('/contact/search_result/:id');
+         }else {
+           console.log(JSON.stringify(data, undefined, 2));
+           res.redirect('/contact/search_result/' + data._id);
+         }
+       });
+     }
 
 });
    app.get('/contact/search_result/:id', authenticate, (req, res) => {
