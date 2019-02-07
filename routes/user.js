@@ -113,6 +113,7 @@ module.exports = (app) => {
   });
 
   app.get('/all_users', authenticate, (req, res) => {
+    var success = req.flash('Success!')
     User.find({}, (err, result) => {
       if (err) {
         return console.log('Unable to fetch all users.');
@@ -121,8 +122,34 @@ module.exports = (app) => {
       res.render('users.ejs', {
         title: 'All Users || CMS',
         user: req.user,
-        data: result
+        data: result,
+        success,
+        noErrors: success.length > 0
       })
+    });
+  });
+
+  app.get('/delete_user', authenticate, (req, res) => {
+    res.render('deleteUser.ejs', {
+      title: 'Delete User || CMS',
+      user: req.user
+    })
+  });
+
+  app.post('/delete_user', authenticate, (req,res) => {
+    var username = req.body.username;
+    User.findOneAndRemove({username}, (err, result) => {
+      if (err) {
+        return console.log('Unable to delete the user', err);
+      }
+
+      if (!result) {
+        console.log('User does not exist!.');
+      }
+
+      req.flash('Success!', 'User deleted successfully');
+      res.redirect('all_users');
+
     });
   });
 
