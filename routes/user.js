@@ -5,6 +5,7 @@ var fs = require('fs');
 var User = require('./../models/userModel');
 var nodemailer = require('nodemailer');
 var {authenticate} = require('./../middlewares/authenticate');
+var {authorize} = require('./../middlewares/authorize');
 // const {body} = require('express-validator/check');
 
 module.exports = (app) => {
@@ -12,7 +13,7 @@ module.exports = (app) => {
       res.render('index.ejs', {title: 'Index'});
     });
 
-  app.get('/signup', authenticate, (req, res) => {
+  app.get('/signup', authenticate, authorize, (req, res) => {
     var errors = req.flash('error');
     console.log(errors);
     res.render('user/signup.ejs', {title: 'Sign Up', messages: errors, hasErrors: errors.length > 0});
@@ -23,7 +24,12 @@ module.exports = (app) => {
     var errors = req.flash('error');
     console.log(errors);
     console.log(error_1);
-    res.render('user/login.ejs', {title: 'Login', errorOutput: error_1, loginFirst: error_1.length > 0, messages: errors, hasErrors: errors.length > 0});
+    res.render('user/login.ejs', {
+      title: 'Login',
+      errorOutput: error_1,
+      loginFirst: error_1.length > 0,
+      messages: errors,
+      hasErrors: errors.length > 0});
   });
 
   app.post('/signup', validate, (req, res) => {
@@ -102,7 +108,13 @@ module.exports = (app) => {
   // })
 
   app.get('/home', authenticate, (req, res) => {
-    res.render('home.ejs', {title: 'Home || CMS', user: req.user});
+    var blocked = req.flash('Blocked!');
+    res.render('home.ejs', {
+      title: 'Home || CMS',
+      user: req.user,
+      blocked,
+      hasErrors: blocked.length > 0
+    });
   });
 
   app.get('/logout', (req, res) => {
@@ -129,7 +141,7 @@ module.exports = (app) => {
     });
   });
 
-  app.get('/delete_user', authenticate, (req, res) => {
+  app.get('/delete_user', authenticate, authorize, (req, res) => {
     res.render('deleteUser.ejs', {
       title: 'Delete User || CMS',
       user: req.user

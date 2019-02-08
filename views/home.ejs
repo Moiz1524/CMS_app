@@ -12,6 +12,14 @@
           <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
             <h1>Hello <%= user.username %>!</h1>
               <p>What would you like to do today ?</p>
+              <% if (hasErrors) {%>
+                  <div class="alert alert-success">
+                     <a href="#" class="close" data-dismiss="alert" aria-label="close">
+                         &times;
+                     </a>
+                     <%= blocked %>
+                  </div>
+              <% } %>
             <div class="row">
               <div class="col-md-4" id="colDesc">
                   <div class="info-icon"><i class="fa fa-sign-in"></i></div>
