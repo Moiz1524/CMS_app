@@ -47,7 +47,7 @@
                         <i class="star"></i>
                         <%= data[i].email %>
                       </span>
-                      <% if (data[i].username !== 'Moiz Ali') { %>
+                      <% if (data[i].username !== 'Moiz Ali' && user.isAdmin === true) { %>
                           <a href="#" class="btn btn-danger btn-sm pull-right mt-2 delete-user" role="button" dataId= <%= data[i]._id %>>Delete</a>
                       <% } %>
                   </div>
