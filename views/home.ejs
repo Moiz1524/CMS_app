@@ -12,8 +12,17 @@
           <a href="#menu-toggle" class="btn btn-default" id="menu-toggle">Toggle Menu</a>
             <h1>Hello <%= user.username %>!</h1>
               <p>What would you like to do today ?</p>
-              <% if (hasErrors) {%>
-                  <div class="alert alert-success">
+              <br>
+              <% if (userCreatedLength) { %>
+                <div class="alert alert-success">
+                   <a href="#" class="close" data-dismiss="alert" aria-label="close">
+                       &times;
+                   </a>
+                   <%= userCreated %>
+                </div>
+              <% } %>
+            <% if (hasErrors) {%>
+                  <div class="alert alert-danger">
                      <a href="#" class="close" data-dismiss="alert" aria-label="close">
                          &times;
                      </a>

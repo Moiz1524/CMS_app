@@ -24,6 +24,14 @@
                <%= success %>
             </div>
         <% } %>
+        <% if (noDeleteErrors) {%>
+            <div class="alert alert-success">
+               <a href="#" class="close" data-dismiss="alert" aria-label="close">
+                   &times;
+               </a>
+               <%= deleted %>
+            </div>
+        <% } %>
       <% for (var i = 0; i < data.length; i++ ) { %>
         <div class="row">
           <div class="col-md-4" style="margin-bottom:10px;">
@@ -39,11 +47,13 @@
                         <i class="star"></i>
                         <%= data[i].email %>
                       </span>
+                      <% if (data[i].username !== 'Moiz Ali') { %>
+                          <a href="#" class="btn btn-danger btn-sm pull-right mt-2 delete-user" role="button" dataId= <%= data[i]._id %>>Delete</a>
+                      <% } %>
                   </div>
                 </div>
               </div>
-
-              </div>
+            </div>
           </div>
         </div>
       <% } %>

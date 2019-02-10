@@ -40,6 +40,8 @@ module.exports = (app) => {
     }, (err, result) => {
       if (result) {
         console.log('User already exists!.');
+        console.log(JSON.stringify(result, undefined, 2));
+        req.flash('error', 'User already exists with the email you entered!.')
         res.redirect('/signup');
       }else {
 
@@ -61,6 +63,9 @@ module.exports = (app) => {
         }
           return user;
       });
+
+      req.flash('Registered!', 'User created successfully!');
+
       var transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
@@ -108,12 +113,15 @@ module.exports = (app) => {
   // })
 
   app.get('/home', authenticate, (req, res) => {
+    var userCreated = req.flash('Registered!');
     var blocked = req.flash('Blocked!');
     res.render('home.ejs', {
       title: 'Home || CMS',
       user: req.user,
       blocked,
-      hasErrors: blocked.length > 0
+      hasErrors: blocked.length > 0,
+      userCreated,
+      userCreatedLength: userCreated.length > 0
     });
   });
 
@@ -125,6 +133,7 @@ module.exports = (app) => {
   });
 
   app.get('/all_users', authenticate, (req, res) => {
+    var deleted = req.flash('Deleted!');
     var success = req.flash('Success!')
     User.find({}, (err, result) => {
       if (err) {
@@ -136,7 +145,9 @@ module.exports = (app) => {
         user: req.user,
         data: result,
         success,
-        noErrors: success.length > 0
+        noErrors: success.length > 0,
+        deleted,
+        noDeleteErrors: deleted.length > 0
       })
     });
   });
@@ -160,11 +171,20 @@ module.exports = (app) => {
       }
 
       req.flash('Success!', 'User deleted successfully');
-      res.redirect('all_users');
+      res.redirect('/all_users');
 
     });
   });
 
+  app.delete('/user/:id', (req, res) => {
+    User.remove({_id: req.params.id}, (err, result) => {
+      if (err) {
+        return console.log(err)
+      }
+    res.send('Success');
+  });
+    req.flash('Deleted!', 'User deleted!');
+  });
 };
 
 var validateLogin = (req, res, next) => {
