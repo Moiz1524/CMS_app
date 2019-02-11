@@ -185,6 +185,37 @@ module.exports = (app) => {
   });
     req.flash('Deleted!', 'User deleted!');
   });
+  //
+  app.get('/user/edit/:id', authenticate, authorize, (req, res) => {
+      User.findById(req.params.id, (err, result) => {
+        if (err) {
+          return console.log(err);
+        }
+        res.render('editUser.ejs', {
+          title: 'Edit Article || CMS',
+          user: req.user,
+          data: result
+        });
+      })
+    });
+
+  app.post('/user/edit/:id', (req, res) => {
+    var user = {};
+    user.username = req.body.username;
+    user.email = req.body.email;
+    user.password = req.body.password;
+    user.confirmPassword = req.body.confirmPassword
+    user.image = req.body.upload;
+
+    User.update({_id: req.params.id},  user, (err, result) => {
+      if (err) {
+        return console.log(err);
+      }
+
+      console.log('Updated Successfully!');
+      res.redirect('/all_users');
+    });
+  });
 };
 
 var validateLogin = (req, res, next) => {

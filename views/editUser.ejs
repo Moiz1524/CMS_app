@@ -11,31 +11,21 @@
 
 
    <div class="text-center reg_msg">
-        <h2 class="fancy"><span>Register User</span></h2>
+        <h2 class="fancy"><span>Edit User</span></h2>
    </div><br>
 
     <div class="row signup">
 
-      <% if (hasErrors) { %>
-        <% for ( var i=0; i < messages.length; i++ ){ %>
-          <div class="alert alert-danger">
-            <a href="#" class="close" data-dismiss="alert" aria-label="close">
-
-            </a>
-            <%= messages[i] %>
-          </div>
-      <%  } %>
-      <% } %>
-        <form method="POST" class="" id="signupForm" action="/signup">
+        <form method="POST" class="" id="signupForm" action="/user/edit/<%= data._id %>">
 
             <div class="row">
                 <div class="form-group col-xs-12 input_group">
-                    <input id="fullname" class="form-control" name="username" type="text" autocomplete="on" placeholder="Username" style="margin-top: 50px; margin-bottom:20px;" >
+                    <input id="fullname" class="form-control" name="username" value="<%= data.username%>"type="text" autocomplete="on" placeholder="Username" style="margin-top: 50px; margin-bottom:20px;" >
                 </div>
             </div>
 
             <div class="form-group input_group">
-                <input id="email" class="form-control" name="email" type="text" autocomplete="on" placeholder="Email" style="margin-bottom:20px;">
+                <input id="email" class="form-control" name="email" value="<%= data.email%>"type="text" autocomplete="on" placeholder="Email" style="margin-bottom:20px;">
             </div>
 
             <div class="form-group input_group">
@@ -51,7 +41,7 @@
             <div class="form-group ">
                 <label for="">User Image</label><br>
 
-                <button class="btn btn-lg" type="button" data-toggle="modal" data-target="#file">Add Image</button>
+                <button class="btn btn-lg" type="button" data-toggle="modal" data-target="#file">Edit Image</button>
                 <span id="completed"></span>
 
                 <div id="file" class="modal" tabindex="-1" role="dialog">
@@ -81,7 +71,7 @@
             <br>
 
             <div class="form-group">
-                <input type="submit" id="submit" value="REGISTER" class="form-control btn btn-primary" name="submit" style="">
+                <input type="submit" id="submit" value="UPDATE" class="form-control btn btn-primary" name="submit" style="">
             </div>
 
 
