@@ -187,6 +187,7 @@ module.exports = (app) => {
   });
   //
   app.get('/user/edit/:id', authenticate, authorize, (req, res) => {
+      var errors = req.flash('error');
       User.findById(req.params.id, (err, result) => {
         if (err) {
           return console.log(err);
@@ -194,28 +195,33 @@ module.exports = (app) => {
         res.render('editUser.ejs', {
           title: 'Edit Article || CMS',
           user: req.user,
-          data: result
+          data: result,
+          messages: errors,
+          hasErrors: errors.length > 0
         });
       })
     });
 
-  app.post('/user/edit/:id', (req, res) => {
+  app.post('/user/edit/:id', validateUpdate, (req, res) => {
     var user = {};
     user.username = req.body.username;
     user.email = req.body.email;
     user.password = req.body.password;
-    user.confirmPassword = req.body.confirmPassword
-    user.image = req.body.upload;
+    user.confirmPassword = req.body.confirmPassword;
+    if (req.body.upload !== '') {
+      user.image = req.body.upload;
+    }
 
-    User.update({_id: req.params.id},  user, (err, result) => {
+    User.findOneAndUpdate({_id: req.params.id}, user, (err, result) => {
       if (err) {
         return console.log(err);
       }
-
-      console.log('Updated Successfully!');
-      res.redirect('/all_users');
-    });
+        console.log(JSON.stringify(result, undefined, 2));
+        console.log('Updated Successfully!');
+      });
+    res.redirect('/all_users');
   });
+
 };
 
 var validateLogin = (req, res, next) => {
@@ -262,6 +268,34 @@ var validate = (req, res, next) => {
     return next();
   }
 };
+
+var validateUpdate = (req, res, next) => {
+  var id = req.params.id;
+  req.checkBody('username', 'Username is required').notEmpty();
+  req.checkBody('username', 'Username must not be less than 5').isLength({min: 5});
+  req.checkBody('email', 'Email is required').notEmpty();
+  req.checkBody('email', 'Email is invalid').isEmail();
+  req.checkBody('password', 'Password is required').notEmpty();
+  req.checkBody('password', 'Password must not be less than 5').isLength({min: 5});
+  req.check("password", "Password Must Contain at least 1 Number.").matches(/^(?=.*\d)(?=.*[a-z])[0-9a-z]{5,}$/, "i");
+  req.checkBody('confirmPassword', 'Passwords Mismatched!').equals(req.body.password);
+
+
+  var errors = req.validationErrors();
+
+  if (errors) {
+    var messages = [];
+    errors.forEach((error) => {
+      messages.push(error.msg);
+    });
+
+    req.flash('error', messages);
+    res.redirect(`/user/edit/${id}`);
+  }else {
+    return next();
+  }
+};
+
 
 // var validateUser = (req, res) => {
 //   if (req.body.isAdmin === true) {
