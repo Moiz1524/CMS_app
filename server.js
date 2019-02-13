@@ -20,29 +20,6 @@ const port = process.env.PORT || 3000;
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI ||  'mongodb://localhost:27017/CMS_db', {useNewUrlParser: true});
 
-// var store = new MongoDBStore({
-//   uri: 'mongodb://localhost:27017/CMS_db',
-//   collection: 'sessions'
-// });
-//
-// // Catch errors
-// store.on('error', function(error) {
-//   console.log(error);
-// });
-//
-// app.use(require('express-session')({
-//   secret: 'This is a secret',
-//   cookie: {
-//     maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
-//   },
-//   store: store,
-//   // Boilerplate options, see:
-//   // * https://www.npmjs.com/package/express-session#resave
-//   // * https://www.npmjs.com/package/express-session#saveuninitialized
-//   resave: false,
-//   saveUninitialized: false
-// }));
-
 require('./config/passport');
 
 
@@ -68,6 +45,27 @@ app.use(passport.session());
 
 require('./routes/user')(app);
 require('./routes/newContact')(app);
+
+app.use(function(req, res, next){
+  res.status(404);
+
+  res.format({
+    html: function () {
+      res.render('404.ejs', { url: req.url })
+    },
+    json: function () {
+      res.json({ error: 'Not found' })
+    },
+    default: function () {
+      res.type('txt').send('Not found')
+    }
+  })
+});
+
+app.use(function(err, req, res, next){
+  res.status(err.status || 500);
+  res.render('500.ejs', { error: err });
+});
 
 app.listen(port, () => {
   console.log(`Server is up on port ${port}`);

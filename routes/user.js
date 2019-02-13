@@ -134,7 +134,8 @@ module.exports = (app) => {
 
   app.get('/all_users', authenticate, (req, res) => {
     var deleted = req.flash('Deleted!');
-    var success = req.flash('Success!')
+    var success = req.flash('Success!');
+    var edited = req.flash('Success');
     User.find({}, (err, result) => {
       if (err) {
         return console.log('Unable to fetch all users.');
@@ -147,7 +148,9 @@ module.exports = (app) => {
         success,
         noErrors: success.length > 0,
         deleted,
-        noDeleteErrors: deleted.length > 0
+        noDeleteErrors: deleted.length > 0,
+        edited,
+        noEditErrors: edited.length > 0
       })
     });
   });
@@ -203,11 +206,12 @@ module.exports = (app) => {
     });
 
   app.post('/user/edit/:id', validateUpdate, (req, res) => {
+    var user1 = new User();
     var user = {};
     user.username = req.body.username;
     user.email = req.body.email;
-    user.password = req.body.password;
-    user.confirmPassword = req.body.confirmPassword;
+    user.password = user1.encryptPassword(req.body.password);
+    user.confirmPassword = user1.encryptPassword(req.body.confirmPassword);
     if (req.body.upload !== '') {
       user.image = req.body.upload;
     }
@@ -219,8 +223,26 @@ module.exports = (app) => {
         console.log(JSON.stringify(result, undefined, 2));
         console.log('Updated Successfully!');
       });
+    req.flash('Success', 'Updated successfully');
     res.redirect('/all_users');
+
   });
+
+    app.get('/404', function(req, res, next){
+      next();
+    });
+
+    app.get('/403', function(req, res, next){
+      // trigger a 403 error
+        var err = new Error('not allowed!');
+        err.status = 403;
+        next(err);
+      });
+
+    app.get('/500', function(req, res, next){
+      // trigger a generic (500) error
+        next(new Error('keyboard cat!'));
+      });
 
 };
 

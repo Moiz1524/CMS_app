@@ -371,3 +371,10 @@ input[type="submit"]{
 .mt-2{
   margin-top: 10px !important;
 }
+
+.body1 {
+    background: #dedede;
+}
+.page-wrap {
+    min-height: 100vh;
+}
